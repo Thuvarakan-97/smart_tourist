@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
 {
@@ -27,12 +28,18 @@ class VehicleController extends Controller
             'type' => 'required|string|max:255',
             'description' => 'required|string',
             'price_per_day' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'available_from' => 'nullable|date',
             'available_to' => 'nullable|date|after:available_from',
         ]);
 
-        Vehicle::create($validated);
+        $data = $request->except('image');
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('vehicles', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        Vehicle::create($data);
 
         return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle created successfully.');
     }
@@ -49,12 +56,21 @@ class VehicleController extends Controller
             'type' => 'required|string|max:255',
             'description' => 'required|string',
             'price_per_day' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'available_from' => 'nullable|date',
             'available_to' => 'nullable|date|after:available_from',
         ]);
 
-        $vehicle->update($validated);
+        $data = $request->except('image');
+        if ($request->hasFile('image')) {
+            if ($vehicle->image_url) {
+                Storage::disk('public')->delete($vehicle->image_url);
+            }
+            $imagePath = $request->file('image')->store('vehicles', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        $vehicle->update($data);
 
         return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle updated successfully.');
     }

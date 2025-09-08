@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Accommodation;
 use App\Models\Destination;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AccommodationController extends Controller
 {
@@ -30,12 +31,19 @@ class AccommodationController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price_per_night' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'available_from' => 'nullable|date',
             'available_to' => 'nullable|date|after:available_from',
         ]);
 
-        Accommodation::create($validated);
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('accommodations', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        Accommodation::create($data);
 
         return redirect()->route('admin.accommodations.index')->with('success', 'Accommodation created successfully.');
     }
@@ -54,12 +62,22 @@ class AccommodationController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price_per_night' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'available_from' => 'nullable|date',
             'available_to' => 'nullable|date|after:available_from',
         ]);
 
-        $accommodation->update($validated);
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            if ($accommodation->image_url) {
+                Storage::disk('public')->delete($accommodation->image_url);
+            }
+            $imagePath = $request->file('image')->store('accommodations', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        $accommodation->update($data);
 
         return redirect()->route('admin.accommodations.index')->with('success', 'Accommodation updated successfully.');
     }

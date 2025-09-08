@@ -1,14 +1,50 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Destinations - Smart Tourist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-blue-800 text-white">
+            <div class="p-4">
+                <h1 class="text-xl font-bold">Tourist Menu</h1>
+            </div>
+            <nav class="mt-8">
+                <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-white hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-home mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="{{ route('destinations.index') }}" class="flex items-center px-4 py-3 bg-blue-700 text-white">
+                    <i class="fas fa-globe mr-3"></i>
+                    Destinations
+                </a>
+                <a href="{{ route('accommodations.index') }}" class="flex items-center px-4 py-3 text-white hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-bed mr-3"></i>
+                    Book Rooms
+                </a>
+                <a href="{{ route('vehicles.index') }}" class="flex items-center px-4 py-3 text-white hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-car mr-3"></i>
+                    Rent Vehicles
+                </a>
+                <form method="POST" action="{{ route('logout') }}" class="mt-auto">
+                    @csrf
+                    <button type="submit" class="flex items-center px-4 py-3 text-red-400 hover:bg-blue-700 transition-colors w-full">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
+                        Logout
+                    </button>
+                </form>
+            </nav>
+        </div>
 
-@section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-        <a href="{{ route('dashboard') }}" class="text-blue-600 hover:text-blue-800">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-        </a>
-    </div>
-
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">Explore Destinations</h2>
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Explore Destinations</h2>
 
                 <!-- Search Bar -->
                 <div class="mb-6">
@@ -55,5 +91,6 @@
             </div>
         </div>
     </div>
-@endsection
 
+</body>
+</html>

@@ -11,7 +11,7 @@
         </div>
 
         <div class="bg-white shadow-md rounded-lg p-6">
-            <form action="{{ route('admin.accommodations.store') }}" method="POST">
+            <form action="{{ route('admin.accommodations.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-4">
@@ -72,10 +72,10 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="image_url" class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                    <input type="url" name="image_url" id="image_url" value="{{ old('image_url') }}"
+                    <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                    <input type="file" name="image" id="image" accept="image/*"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    @error('image_url')
+                    @error('image')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>

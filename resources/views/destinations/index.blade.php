@@ -24,7 +24,7 @@
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
                         <div class="h-48 bg-gray-200 flex items-center justify-center">
                             @if($destination->image_url)
-                                <img src="{{ asset('storage/' . $destination->image_url) }}" alt="{{ $destination->name }}" class="w-full h-full object-cover">
+                                <img src="{{ Storage::url($destination->image_url) }}" alt="{{ $destination->name }}" class="w-full h-full object-cover">
                             @else
                                 <div class="text-center">
                                     <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>

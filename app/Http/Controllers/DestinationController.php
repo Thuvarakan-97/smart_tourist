@@ -17,6 +17,38 @@ class DestinationController extends Controller
     }
 
     /**
+     * Discover places with district filtering
+     */
+    public function discover(Request $request)
+    {
+        $query = Destination::query();
+
+        // Filter by district if provided
+        if ($request->has('district') && $request->district) {
+            $query->where('district', $request->district);
+        }
+
+        // Filter by search term if provided
+        if ($request->has('search') && $request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $destinations = $query->orderBy('rating', 'desc')->paginate(12);
+
+        // Get all districts for filter dropdown
+        $districts = Destination::select('district')
+            ->whereNotNull('district')
+            ->distinct()
+            ->orderBy('district')
+            ->pluck('district');
+
+        return view('discover-places', compact('destinations', 'districts'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

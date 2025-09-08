@@ -151,7 +151,7 @@
                                             {{ $booking->tourist->name }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $booking->vehicle ? ucfirst($booking->vehicle->type) : 'N/A' }}
+                                            {{ ucfirst($booking->vehicle->type) }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $booking->start_date->format('M d') }} - {{ $booking->end_date->format('M d, Y') }}

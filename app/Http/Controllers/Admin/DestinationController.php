@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DestinationController extends Controller
 {
@@ -25,13 +26,22 @@ class DestinationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'image_url' => 'nullable|string',
+            'district' => 'required|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
             'rating' => 'nullable|numeric|min:0|max:5',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
 
-        Destination::create($validated);
+        $data = $request->except('image');
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('destinations', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        Destination::create($data);
 
         return redirect()->route('admin.destinations.index')->with('success', 'Destination created successfully.');
     }
@@ -46,13 +56,27 @@ class DestinationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'image_url' => 'nullable|string',
+            'district' => 'required|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'rating' => 'nullable|numeric|min:0|max:5',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
 
-        $destination->update($validated);
+        $data = $request->except('image');
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($destination->image_url) {
+                Storage::disk('public')->delete($destination->image_url);
+            }
+
+            $imagePath = $request->file('image')->store('destinations', 'public');
+            $data['image_url'] = $imagePath;
+        }
+
+        $destination->update($data);
 
         return redirect()->route('admin.destinations.index')->with('success', 'Destination updated successfully.');
     }

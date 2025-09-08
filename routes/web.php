@@ -9,8 +9,25 @@ use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $destinations = \App\Models\Destination::orderBy('rating', 'desc')->take(3)->get();
+
+    // Get current user's bookings if authenticated
+    $userBookings = null;
+    if (auth()->check()) {
+        $userBookings = \App\Models\Booking::where('tourist_id', auth()->id())
+            ->where('status', '!=', 'cancelled')
+            ->where('end_date', '>=', now())
+            ->with(['accommodation.destination', 'vehicle'])
+            ->orderBy('start_date', 'asc')
+            ->take(4)
+            ->get();
+    }
+
+    return view('welcome', compact('destinations', 'userBookings'));
 });
+
+// Discover Places page
+Route::get('/discover-places', [DestinationController::class, 'discover'])->name('discover.places');
 
 // Test route to check authentication
 // Test route to check data
@@ -42,6 +59,12 @@ Route::get('/test-auth', function () {
 Route::get('/test-users', function () {
     $users = \App\Models\User::select('id', 'name', 'email', 'role', 'created_at')->get();
     return response()->json($users);
+});
+
+// Test route to check destinations in database
+Route::get('/test-destinations', function () {
+    $destinations = \App\Models\Destination::select('id', 'name', 'description', 'rating', 'latitude', 'longitude', 'image_url')->get();
+    return response()->json($destinations);
 });
 
 // Debug route to test vehicle owner dashboard

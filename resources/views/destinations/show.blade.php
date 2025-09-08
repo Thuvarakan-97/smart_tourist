@@ -41,9 +41,26 @@
                             @endif
                         </div>
                     </div>
-                    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-map mr-2"></i>View on Map
-                    </button>
+                    @if($destination->latitude && $destination->longitude)
+                        <div class="flex space-x-2">
+                            <button onclick="showOnGoogleMaps({{ $destination->latitude }}, {{ $destination->longitude }}, '{{ $destination->name }}')"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                <i class="fas fa-map mr-1"></i>Google Maps
+                            </button>
+                            <button onclick="showOnAppleMaps({{ $destination->latitude }}, {{ $destination->longitude }}, '{{ $destination->name }}')"
+                                    class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm">
+                                <i class="fas fa-map-marked-alt mr-1"></i>Apple Maps
+                            </button>
+                            <button onclick="copyCoordinates({{ $destination->latitude }}, {{ $destination->longitude }})"
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                                <i class="fas fa-copy mr-1"></i>Copy Coords
+                            </button>
+                        </div>
+                    @else
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-map-marker-alt mr-1"></i>Location not available
+                        </div>
+                    @endif
                 </div>
 
                 <p class="text-gray-700 text-lg leading-relaxed mb-6">{{ $destination->description }}</p>
@@ -104,6 +121,59 @@
         </div>
     </div>
 </div>
+
+<script>
+    function showOnGoogleMaps(lat, lng, name) {
+        // Open Google Maps with the destination coordinates
+        const url = `https://www.google.com/maps?q=${lat},${lng}&z=15`;
+        window.open(url, '_blank');
+    }
+
+    function showOnAppleMaps(lat, lng, name) {
+        // Open Apple Maps with the destination coordinates
+        const url = `https://maps.apple.com/?q=${lat},${lng}&z=15`;
+        window.open(url, '_blank');
+    }
+
+    function copyCoordinates(lat, lng) {
+        // Copy coordinates to clipboard
+        const coordinates = `${lat}, ${lng}`;
+        navigator.clipboard.writeText(coordinates).then(function() {
+            // Show success message
+            showNotification('Coordinates copied to clipboard!', 'success');
+        }).catch(function() {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = coordinates;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showNotification('Coordinates copied to clipboard!', 'success');
+        });
+    }
+
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
+            type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+        }`;
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-${type === 'success' ? 'check' : 'info'}-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+</script>
 @endsection
 
 
